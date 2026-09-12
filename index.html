@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sana Özel Bir Sürpriz...</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f8fafc;
+            overflow: hidden; /* Kaçan buton ekranı kaydırmasın diye */
+            touch-action: manipulation;
+        }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .fade-transition {
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        .hide {
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            transform: scale(0.95);
+        }
+
+        /* Özel Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 32px;
+            width: 32px;
+            border-radius: 50%;
+            background: #f43f5e;
+            cursor: pointer;
+            margin-top: -12px;
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.6);
+            transition: background 0.2s;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 10px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col items-center justify-center p-4 relative">
+
+    <!-- GENEL UYARI MODALI (Custom Alert) -->
+    <div id="custom-alert" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[60] fade-transition hide">
+        <div class="bg-slate-800 border border-rose-500 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
+            <p id="custom-alert-text" class="text-slate-200 mb-6 text-lg"></p>
+            <button onclick="closeAlert()" class="bg-rose-500 w-full py-2 rounded-lg font-semibold text-white">Tamam</button>
+        </div>
+    </div>
+
+    <!-- EKRAN 1: GİRİŞ -->
+    <section id="screen-login" class="glass-panel w-full max-w-md rounded-2xl p-8 text-center fade-transition flex flex-col justify-center">
+        <div class="mb-6">
+            <h1 class="text-3xl font-semibold text-rose-400 mb-2">Sistem Girişi</h1>
+            <p class="text-sm text-slate-400">Lütfen kimliğinizi doğrulayın.</p>
+        </div>
+        
+        <div class="text-left mb-4">
+            <label class="block text-xs text-slate-400 mb-1">Kullanıcı Adı</label>
+            <input type="text" value="dünyanın_en_tatlı_kızı" readonly 
+                   class="w-full bg-slate-800/50 border border-slate-600 rounded-lg p-3 text-rose-200 outline-none text-center">
+        </div>
+
+        <div class="text-left mb-6">
+            <label class="block text-xs text-slate-400 mb-1">Şifre (Hangi gün sevgili olduk?)</label>
+            <input type="date" id="password-input" 
+                   class="w-full bg-slate-800/50 border border-slate-600 rounded-lg p-3 text-white focus:border-rose-500 outline-none transition-colors [color-scheme:dark]">
+            <p id="login-error" class="text-rose-500 text-xs mt-2 hidden">Hatalı tarih! Kalbimi çaldığın günü düşün...</p>
+        </div>
+
+        <button onclick="checkPassword()" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-semibold py-3 rounded-lg transition-colors">
+            Giriş Yap
+        </button>
+    </section>
+
+    <!-- EKRAN 2: QUIZ MEKANİKLERİ -->
+    <section id="screen-quiz" class="glass-panel w-full max-w-md rounded-2xl p-8 text-center fade-transition hide relative max-h-[90vh] overflow-y-auto">
+        <div class="mb-6 flex justify-between text-xs text-slate-400 font-semibold uppercase tracking-wider border-b border-slate-700 pb-2">
+            <span>Aşk Testi</span>
+            <span id="question-counter">1/9</span>
+        </div>
+
+        <!-- Soru 1: Kaçan Buton -->
+        <div id="q1" class="quiz-step">
+            <h2 class="text-xl font-semibold mb-10">Benimle geçirdiğin son zamanlar hayatının en güzel dönemi miydi?</h2>
+            <div class="flex justify-center gap-6 relative h-20">
+                <button onclick="nextQuestion(2)" class="bg-emerald-500 hover:bg-emerald-600 px-8 py-3 rounded-full font-semibold text-lg z-10">Evet</button>
+                <button id="btn-no" class="bg-slate-600 px-8 py-3 rounded-full font-semibold text-lg absolute right-0 transition-transform duration-100 ease-out z-50">Hayır</button>
+            </div>
+        </div>
+
+        <!-- Soru 2: Hacker Typer -->
+        <div id="q2" class="quiz-step hidden">
+            <h2 class="text-lg font-semibold mb-4">Sence benim en çekici veya en sevdiğin özelliğim ne? (Klavyeden yaz)</h2>
+            <textarea id="hacker-input" rows="4" placeholder="Bir şeyler yaz..." 
+                      class="w-full bg-slate-800 border border-slate-600 rounded-lg p-3 text-rose-300 outline-none resize-none"></textarea>
+            <button onclick="nextQuestion(3)" id="btn-q2" class="w-full bg-rose-500 py-3 rounded-lg mt-4 opacity-50 pointer-events-none transition-opacity">Cevabı Onayla</button>
+        </div>
+
+        <!-- Soru 3: Dinamik Slider -->
+        <div id="q3" class="quiz-step hidden">
+            <h2 class="text-xl font-semibold mb-8">Beni ne kadar çok seviyorsun?</h2>
+            <div class="mb-10">
+                <input type="range" id="love-slider" min="0" max="100" value="50">
+                <div class="flex justify-between text-xs text-slate-400 mt-3">
+                    <span>%0</span>
+                    <span>%50</span>
+                    <span>%100</span>
+                </div>
+            </div>
+            <button onclick="checkSlider()" id="btn-q3" class="w-full bg-rose-500 py-3 rounded-lg font-semibold transition-all">İdare eder... (Onayla)</button>
+        </div>
+
+        <!-- Soru 4: Aktörler Checkbox -->
+        <div id="q4" class="quiz-step hidden">
+            <h2 class="text-lg font-semibold mb-4">Dünyanın en yakışıklı ve karizmatik erkekleri kimlerdir? (Seçim yapınız)</h2>
+            <div class="grid grid-cols-2 gap-3 mb-6 text-sm">
+                <!-- Seçildiğinde stilin çok net değişmesi için peer-checked tasarımı güncellendi -->
+                <label class="cursor-pointer relative block">
+                    <input type="checkbox" class="actor-check peer sr-only" value="Brad">
+                    <div class="p-3 rounded-lg border-2 border-slate-600 bg-slate-800 text-slate-300 peer-checked:bg-rose-500 peer-checked:border-white peer-checked:text-white peer-checked:font-bold transition-all flex justify-between items-center h-full">
+                        <span>Brad Pitt</span>
+                        <span class="opacity-0 peer-checked:opacity-100">✓</span>
+                    </div>
+                </label>
+                <label class="cursor-pointer relative block">
+                    <input type="checkbox" class="actor-check peer sr-only" value="Ryan">
+                    <div class="p-3 rounded-lg border-2 border-slate-600 bg-slate-800 text-slate-300 peer-checked:bg-rose-500 peer-checked:border-white peer-checked:text-white peer-checked:font-bold transition-all flex justify-between items-center h-full">
+                        <span>Ryan Gosling</span>
+                        <span class="opacity-0 peer-checked:opacity-100">✓</span>
+                    </div>
+                </label>
+                <label class="cursor-pointer relative block">
+                    <input type="checkbox" class="actor-check peer sr-only" value="Chris">
+                    <div class="p-3 rounded-lg border-2 border-slate-600 bg-slate-800 text-slate-300 peer-checked:bg-rose-500 peer-checked:border-white peer-checked:text-white peer-checked:font-bold transition-all flex justify-between items-center h-full">
+                        <span>Chris Hemsworth</span>
+                        <span class="opacity-0 peer-checked:opacity-100">✓</span>
+                    </div>
+                </label>
+                <label class="cursor-pointer relative block">
+                    <input type="checkbox" class="actor-check peer sr-only" value="Henry">
+                    <div class="p-3 rounded-lg border-2 border-slate-600 bg-slate-800 text-slate-300 peer-checked:bg-rose-500 peer-checked:border-white peer-checked:text-white peer-checked:font-bold transition-all flex justify-between items-center h-full">
+                        <span>Henry Cavill</span>
+                        <span class="opacity-0 peer-checked:opacity-100">✓</span>
+                    </div>
+                </label>
+            </div>
+            <button onclick="checkActors()" class="w-full bg-rose-500 py-3 rounded-lg font-semibold">Devam Et</button>
+        </div>
+
+        <!-- Soru 4.5 (Yüzleşme Ekranı) -->
+        <div id="q4_5" class="quiz-step hidden">
+            <h2 class="text-lg font-semibold mb-6 text-white">Gerçekten böyle mi düşünüyorsun? Benim tırnağım bile olamazlar. Değil miiiii :(</h2>
+            <div class="grid gap-3 text-sm">
+                <button onclick="showAlert('Bağlantı hatası, cevap iletilemedi 🚫')" class="bg-slate-700 hover:bg-slate-600 p-3 rounded-lg text-left">
+                    Buna cevap vermek istemiyorum.
+                </button>
+                <button onclick="checkActorApology()" class="bg-slate-700 hover:bg-slate-600 p-3 rounded-lg text-left border-l-4 border-rose-500">
+                    Şıklarda sen yoktun, mecburen seçtim
+                </button>
+                <button onclick="showAlert('Öhömm, bir daha düşün istersen 😒')" class="bg-slate-700 hover:bg-slate-600 p-3 rounded-lg text-left">
+                    Bunların yanında sen de insan mısın be! Onları yerimmm
+                </button>
+            </div>
+        </div>
+
+        <!-- Soru 5: Şehir -->
+        <div id="q5" class="quiz-step hidden">
+            <h2 class="text-xl font-semibold mb-6">Marmaris doğumluyum ama şu an hangi şehrin ayazını yiyorum?</h2>
+            <div class="grid gap-3">
+                <button onclick="checkCity('Antalya')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Antalya</button>
+                <button onclick="checkCity('Eskişehir')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Eskişehir</button>
+                <button onclick="checkCity('İzmir')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">İzmir</button>
+            </div>
+        </div>
+
+        <!-- Soru 6: Sıcak ve Kalabalık -->
+        <div id="q6" class="quiz-step hidden">
+            <h2 class="text-lg font-semibold mb-6">Yazın 40 derece sıcakta, kalabalık bir düğüne/partiye gitme fikri bana ne hissettirir?</h2>
+            <div class="grid gap-3">
+                <button onclick="checkHeat('Bayılırım')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Bayılırım, çok eğlenceli!</button>
+                <button onclick="checkHeat('FenaDeğil')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Katlanabilirim herhalde</button>
+                <button onclick="checkHeat('MaviEkran')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-semibold text-rose-300">Windows Mavi Ekran (Error) Veririm</button>
+            </div>
+        </div>
+
+        <!-- Soru 7: Oyun/Tatil -->
+        <div id="q7" class="quiz-step hidden">
+            <h2 class="text-xl font-semibold mb-6">Tatili ve gezmeyi sevmediğime göre, boş zamanımda beni nerede bulursun?</h2>
+            <div class="grid gap-3">
+                <button onclick="checkHobby('Tatil')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Seyahat rotası çizerken</button>
+                <button onclick="checkHobby('Oyun')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Bilgisayar başında oyun gömerken</button>
+                <button onclick="checkHobby('Parti')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Dışarıda kalabalıkta</button>
+            </div>
+        </div>
+
+        <!-- Soru 8: Yaş -->
+        <div id="q8" class="quiz-step hidden">
+            <h2 class="text-xl font-semibold mb-6">Bir yazılımcı olarak tam şu an hayatımın kaçıncı 'level'ındayım (yaşındayım)?</h2>
+            <input type="number" id="age-input" placeholder="Yaşım..." 
+                   class="w-32 mx-auto bg-slate-800 border border-slate-600 rounded-lg p-3 text-center text-xl text-white outline-none mb-6 block">
+            <button onclick="checkAge()" class="w-full bg-rose-500 py-3 rounded-lg font-semibold">Cevapla</button>
+        </div>
+
+        <!-- Soru 9: Gelecek Sözü (404 Modal) -->
+        <div id="q9" class="quiz-step hidden">
+            <h2 class="text-xl font-semibold mb-8">Gelecekte birlikte daha çok anı biriktireceğimize söz veriyor musun?</h2>
+            <div class="flex gap-4 justify-center">
+                <button onclick="finishTest()" class="bg-emerald-500 py-3 px-4 rounded-lg font-semibold w-1/2">Söz Veriyorum</button>
+                <button onclick="show404()" class="bg-slate-600 py-3 px-4 rounded-lg font-semibold w-1/2">Düşünmem Lazım</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- EKRAN 3: FİNAL -->
+    <section id="screen-final" class="glass-panel w-full max-w-md rounded-2xl p-8 text-center fade-transition hide">
+        <div class="text-emerald-400 text-6xl mb-4">✨</div>
+        <h1 class="text-4xl font-bold text-white mb-2">Başarı Skoru: %100</h1>
+        <h2 class="text-2xl text-rose-400 mb-6">Tebrikler Sevgilim!</h2>
+        
+        <p class="text-slate-300 leading-relaxed text-lg mb-4">
+            Beni bu kadar kusursuz bir şekilde tanıdığına emindim. Eskişehir'in soğuğunda, bilgisayar başında oyun oynarken bile aklımda sadece sen varsın. 
+        </p>
+        <p class="text-slate-300 leading-relaxed text-lg font-semibold text-rose-300">
+            Zaten aksini seçme şansın da yoktu... İyi ki hayatımdasın, seni çok seviyorum! ❤️
+        </p>
+    </section>
+
+    <!-- JavaScript Mekanikleri -->
+    <script>
+        let selectedActorCount = 0;
+
+        // --- CUSTOM ALERT SİSTEMİ ---
+        function showAlert(msg) {
+            document.getElementById('custom-alert-text').innerText = msg;
+            const modal = document.getElementById('custom-alert');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('hide'), 10);
+        }
+        function closeAlert() {
+            const modal = document.getElementById('custom-alert');
+            modal.classList.add('hide');
+            setTimeout(() => modal.classList.add('hidden'), 500);
+        }
+
+        // --- EKRAN GEÇİŞİ ---
+        function switchScreen(fromId, toId) {
+            const fromEl = document.getElementById(fromId);
+            const toEl = document.getElementById(toId);
+            fromEl.classList.add('hide');
+            setTimeout(() => {
+                fromEl.classList.add('hidden');
+                toEl.classList.remove('hidden');
+                setTimeout(() => toEl.classList.remove('hide'), 50);
+            }, 500);
+        }
+
+        function nextQuestion(num) {
+            document.querySelectorAll('.quiz-step').forEach(el => el.classList.add('hidden'));
+            document.getElementById('q' + num).classList.remove('hidden');
+            
+            // 4_5 (yüzleşme) ekranında sayaç hala 4 olarak görünsün diye ufak bir ayar
+            let displayNum = num === '4_5' ? 4 : num;
+            document.getElementById('question-counter').innerText = displayNum + '/9';
+        }
+
+        // --- GİRİŞ KONTROLÜ ---
+        function checkPassword() {
+            const input = document.getElementById('password-input').value;
+            // Senin koddaki tarih: 2026-06-20
+            const correctPassword = "2026-06-20"; 
+
+            if(input === correctPassword) {
+                switchScreen('screen-login', 'screen-quiz');
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+                document.getElementById('password-input').classList.add('border-rose-500');
+            }
+        }
+
+        // --- Soru 1: Kaçan Buton ---
+        const noBtn = document.getElementById('btn-no');
+        let isFirstMove = true;
+
+        const moveButton = (e) => {
+            e.preventDefault();
+            
+            if(isFirstMove) {
+                noBtn.style.position = 'fixed';
+                isFirstMove = false;
+            }
+
+            const btnWidth = noBtn.offsetWidth;
+            const btnHeight = noBtn.offsetHeight;
+            const maxX = window.innerWidth - btnWidth - 20;
+            const maxY = window.innerHeight - btnHeight - 20;
+
+            let cursorX = e.clientX || (e.touches && e.touches[0].clientX) || window.innerWidth/2;
+            let cursorY = e.clientY || (e.touches && e.touches[0].clientY) || window.innerHeight/2;
+
+            let newX, newY;
+            let distance = 0;
+
+            while (distance < 150) {
+                newX = Math.random() * maxX;
+                newY = Math.random() * maxY;
+                let dx = newX + (btnWidth/2) - cursorX;
+                let dy = newY + (btnHeight/2) - cursorY;
+                distance = Math.sqrt(dx*dx + dy*dy);
+            }
+
+            noBtn.style.left = newX + 'px';
+            noBtn.style.top = newY + 'px';
+        };
+
+        noBtn.addEventListener('mouseover', moveButton);
+        noBtn.addEventListener('touchstart', moveButton, {passive: false});
+
+        // --- Soru 2: Hacker Typer ---
+        const hackerInput = document.getElementById('hacker-input');
+        const targetText = "Çok düşünceli olman ve beni her zaman gülümsetebilmen.";
+        let typedCount = 0;
+
+        hackerInput.addEventListener('input', () => {
+            typedCount++;
+            if (typedCount > targetText.length) {
+                document.getElementById('btn-q2').classList.remove('opacity-50', 'pointer-events-none');
+                typedCount = targetText.length;
+            }
+            hackerInput.value = targetText.substring(0, typedCount);
+        });
+
+        // --- Soru 3: Dinamik Slider ---
+        const slider = document.getElementById('love-slider');
+        const btnQ3 = document.getElementById('btn-q3');
+
+        slider.addEventListener('input', () => {
+            const val = parseInt(slider.value);
+            if(val === 0) btnQ3.innerText = "Benden nefret mi ediyorsun? 😢 (Onayla)";
+            else if(val < 30) btnQ3.innerText = "Sadece arkadaş mıyız? 🥺 (Onayla)";
+            else if(val < 70) btnQ3.innerText = "İdare eder... (Onayla)";
+            else if(val < 100) btnQ3.innerText = "Çok yaklaştın! (Onayla)";
+            else btnQ3.innerText = "İşte Bu! Sonsuz Aşk! ❤️ (Onayla)";
+        });
+
+        function checkSlider() {
+            if(slider.value < 100) {
+                showAlert("Bu pek doğru gelmedi, seçiminiz düzenlendi! 😎");
+                slider.value = 100;
+                btnQ3.innerText = "İşte Bu! Sonsuz Aşk! ❤️ (Onayla)";
+            } else {
+                nextQuestion(4);
+            }
+        }
+
+        // --- Soru 4: Aktörler ---
+        function checkActors() {
+            const checks = document.querySelectorAll('.actor-check:checked');
+            selectedActorCount = checks.length;
+            
+            if(selectedActorCount === 0) {
+                showAlert("Lütfen en azından bir kişi seç! Boş geçemezsin. 🧐");
+            } else {
+                nextQuestion('4_5'); // Yüzleşme ekranına atla
+            }
+        }
+
+        function checkActorApology() {
+            if(selectedActorCount === 1) {
+                showAlert("Yiaaa ❤️ Biliyordum...");
+                setTimeout(() => {
+                    closeAlert();
+                    nextQuestion(5);
+                }, 2000);
+            } else {
+                showAlert("Eeee sırf ilerletebilmek için bir tane seçebilirdin. Neyse inandım diyelim... 😢");
+                setTimeout(() => {
+                    closeAlert();
+                    nextQuestion(5);
+                }, 3000);
+            }
+        }
+
+        // --- Soru 5: Şehir ---
+        function checkCity(city) {
+            if(city === 'Eskişehir') {
+                nextQuestion(6);
+            } else {
+                showAlert("Eskişehir'in ayazını unuttun galiba sevgilim, tekrar düşün! 🥶");
+            }
+        }
+
+        // --- Soru 6: Sıcak/Kalabalık ---
+        function checkHeat(ans) {
+            if(ans === 'MaviEkran') {
+                nextQuestion(7);
+            } else {
+                showAlert("Sıcağı ve kalabalığı ne kadar sevmediğimi unutmuş olamazsın! Terliyorum şu an... 🥵");
+            }
+        }
+
+        // --- Soru 7: Hobi ---
+        function checkHobby(ans) {
+            if(ans === 'Oyun') {
+                nextQuestion(8);
+            } else {
+                showAlert("Ben ve gezmek/partilemek mi? Hata 404 Not Found. 🎮");
+            }
+        }
+
+        // --- Soru 8: Yaş ---
+        function checkAge() {
+            const age = document.getElementById('age-input').value;
+            if(age == 31) {
+                nextQuestion(9);
+            } else {
+                showAlert("Ruh yaşımı değil, fiziksel 'level'ımı (yaşımı) soruyorum! :)");
+            }
+        }
+
+        // --- Soru 9: 404 Modal ---
+        function show404() {
+            showAlert("Error 404: Seçenek Bulunamadı! Bu seçeneğe izin verilmiyor, başka bir ihtimal yok. Lütfen 'Söz Veriyorum' de.");
+        }
+
+        // --- FİNAL ---
+        function finishTest() {
+            switchScreen('screen-quiz', 'screen-final');
+            setTimeout(() => fireConfetti(), 600);
+        }
+
+        function fireConfetti() {
+            var duration = 3000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#f43f5e', '#10b981', '#3b82f6'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#f43f5e', '#10b981', '#3b82f6'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+    </script>
+</body>
+</html>
