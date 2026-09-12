@@ -368,6 +368,9 @@
 
             if(input === correctPassword) {
                 switchScreen('screen-login', 'screen-quiz');
+                if(ytPlayer && typeof ytPlayer.playVideo === 'function') {
+                    ytPlayer.playVideo();
+                }
             } else {
                 document.getElementById('login-error').classList.remove('hidden');
                 document.getElementById('password-input').classList.add('border-rose-500');
