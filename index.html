@@ -101,7 +101,7 @@
     <section id="screen-quiz" class="glass-panel w-full max-w-md rounded-2xl p-8 text-center fade-transition hide relative max-h-[90vh] overflow-y-auto">
         <div class="mb-6 flex justify-between text-xs text-slate-400 font-semibold uppercase tracking-wider border-b border-slate-700 pb-2">
             <span>Aşk Testi</span>
-            <span id="question-counter">1/9</span>
+            <span id="question-counter">1/15</span>
         </div>
 
         <!-- Soru 1: Kaçan Buton -->
@@ -229,9 +229,75 @@
             <button onclick="checkAge()" class="w-full bg-rose-500 py-3 rounded-lg font-semibold">Cevapla</button>
         </div>
 
-        <!-- Soru 9: Gelecek Sözü (404 Modal) -->
+        <!-- Soru 9: Anne Adı -->
         <div id="q9" class="quiz-step hidden">
-            <h2 class="text-xl font-semibold mb-8">Gelecekte birlikte daha çok anı biriktireceğimize söz veriyor musun?</h2>
+            <h2 class="text-xl font-semibold mb-6">Biraz da kütük ve aile sorularına geçelim mi? Annemin adı ne?</h2>
+            <div class="grid gap-3">
+                <button onclick="checkMother('Ayşe')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Ayşe</button>
+                <button onclick="checkMother('Filiz')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Filiz</button>
+                <button onclick="checkMother('Fatma')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Fatma</button>
+                <button onclick="checkMother('Zeynep')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Zeynep</button>
+            </div>
+        </div>
+
+        <!-- Soru 10: Baba Adı -->
+        <div id="q10" class="quiz-step hidden">
+            <h2 class="text-xl font-semibold mb-6">Babamın adı ne?</h2>
+            <div class="grid gap-3">
+                <button onclick="checkFather('Ali')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Ali</button>
+                <button onclick="checkFather('Mustafa')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Mustafa</button>
+                <button onclick="checkFather('Cumhur')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Cumhur</button>
+                <button onclick="checkFather('Kemal')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Kemal</button>
+            </div>
+        </div>
+
+        <!-- Soru 11: Kardeş Sayısı -->
+        <div id="q11" class="quiz-step hidden">
+            <h2 class="text-xl font-semibold mb-6">Kaç kardeşim var?</h2>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="checkSibling(0)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">0</button>
+                <button onclick="checkSibling(1)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">1</button>
+                <button onclick="checkSibling(2)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">2</button>
+                <button onclick="checkSibling(3)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">3</button>
+            </div>
+        </div>
+
+        <!-- Soru 12: Memleket -->
+        <div id="q12" class="quiz-step hidden">
+            <h2 class="text-lg font-semibold mb-6">Ben nereliyim?</h2>
+            <div class="grid gap-3 text-sm">
+                <button onclick="checkHometown('dogru')" class="bg-slate-700 hover:bg-slate-600 p-3 rounded-lg text-left">Muğla'nın Marmaris ilçesine Bağlı Bozburun köyü</button>
+                <button onclick="checkHometown('yanlis1')" class="bg-slate-700 hover:bg-slate-600 p-3 rounded-lg text-left">Muğla'nın Bozburun ilçesine Marmaris Beldesi</button>
+                <button onclick="checkHometown('yanlis2')" class="bg-slate-700 hover:bg-slate-600 p-3 rounded-lg text-left">Muğla'nın Marmaris ilçesine bağlı Boz Boğaz köyü</button>
+            </div>
+        </div>
+
+        <!-- Soru 13: Akraba Bilmecesi 1 -->
+        <div id="q13" class="quiz-step hidden">
+            <h2 class="text-lg font-semibold mb-6">Ablamın kocasının kayınvalidesinin erkek kardeşinin adı Ahmet'tir. Ahmet babamın neyidir?</h2>
+            <div class="grid gap-3 text-sm">
+                <button onclick="checkRiddle1('Kayinbiraderi')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Kayınbiraderi</button>
+                <button onclick="checkRiddle1('Kardesi')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Kardeşi</button>
+                <button onclick="checkRiddle1('Kaynanasi')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Kaynanası</button>
+                <button onclick="checkRiddle1('Dayisi')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Dayısı</button>
+                <button onclick="checkRiddle1('DayisininOglu')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Dayısının Oğlu</button>
+            </div>
+        </div>
+
+        <!-- Soru 14: Akraba Bilmecesi 2 -->
+        <div id="q14" class="quiz-step hidden">
+            <h2 class="text-lg font-semibold mb-6">Önceki sorudaki kişi benim neyimdi ve adı neydi?</h2>
+            <div class="grid gap-3 text-sm">
+                <button onclick="checkRiddle2('Dayi')" class="bg-slate-700 hover:bg-slate-600 p-3 rounded-lg text-left">Dayımdı ve adı Ahmet</button>
+                <button onclick="checkRiddle2('Abi')" class="bg-slate-700 hover:bg-slate-600 p-3 rounded-lg text-left">Abimdi ve adı Handan</button>
+                <button onclick="checkRiddle2('Eniste')" class="bg-slate-700 hover:bg-slate-600 p-3 rounded-lg text-left">Eniştemdi ve Adı Cumhur</button>
+                <button onclick="checkRiddle2('Anne')" class="bg-slate-700 hover:bg-slate-600 p-3 rounded-lg text-left">Annemdi ve Adı Enişte</button>
+            </div>
+        </div>
+
+        <!-- Soru 15: Gelecek Sözü (404 Modal) -->
+        <div id="q15" class="quiz-step hidden">
+            <h2 class="text-xl font-semibold mb-8">Gelelim en önemli soruya... Gelecekte birlikte daha çok anı biriktireceğimize söz veriyor musun?</h2>
             <div class="flex gap-4 justify-center">
                 <button onclick="finishTest()" class="bg-emerald-500 py-3 px-4 rounded-lg font-semibold w-1/2">Söz Veriyorum</button>
                 <button onclick="show404()" class="bg-slate-600 py-3 px-4 rounded-lg font-semibold w-1/2">Düşünmem Lazım</button>
@@ -288,7 +354,7 @@
             
             // 4_5 (yüzleşme) ekranında sayaç hala 4 olarak görünsün diye ufak bir ayar
             let displayNum = num === '4_5' ? 4 : num;
-            document.getElementById('question-counter').innerText = displayNum + '/9';
+            document.getElementById('question-counter').innerText = displayNum + '/15';
         }
 
         // --- GİRİŞ KONTROLÜ ---
@@ -468,7 +534,69 @@
             }
         }
 
-        // --- Soru 9: 404 Modal ---
+        // --- Soru 9: Anne Adı ---
+        function checkMother(ans) {
+            if(ans === 'Filiz') {
+                nextQuestion(10);
+            } else {
+                showAlert("Pişşşt ipucu vereyim mi? Bitkilerle alakalı... 🌿");
+            }
+        }
+
+        // --- Soru 10: Baba Adı ---
+        function checkFather(ans) {
+            if(ans === 'Cumhur') {
+                nextQuestion(11);
+            } else {
+                showAlert("İyetsiz Cumhuriyet Bayramına ne denir? 🇹🇷😉");
+            }
+        }
+
+        // --- Soru 11: Kardeş Sayısı ---
+        function checkSibling(ans) {
+            if(ans === 1) {
+                nextQuestion(12);
+            } else if(ans === 2) {
+                showAlert("Toplam kaç kardeşiz demedim şapşik 😘");
+            } else {
+                showAlert("Bir daha mı düşünsen? 🧐");
+            }
+        }
+
+        // --- Soru 12: Memleket ---
+        function checkHometown(ans) {
+            if(ans === 'dogru') {
+                nextQuestion(13);
+            } else if(ans === 'yanlis1') {
+                showAlert("Kız Marmaris belde mi? Coğrafya hocana selamlar... 🤦‍♂️");
+            } else if(ans === 'yanlis2') {
+                showAlert("Boz Boğaz köyü mü? Öyle bir yer yooook! Uydurma 😂");
+            }
+        }
+
+        // --- Soru 13: Bilmece 1 ---
+        function checkRiddle1(ans) {
+            if(ans === 'Kayinbiraderi') {
+                nextQuestion(14);
+            } else {
+                showAlert("Yanlış cevap! Sıfır, otur yerine.. Öhööm, pardon... KPSS çalışmalarımıza erken başladım sanki. Hadi yapabilirsin! 📚");
+            }
+        }
+
+        // --- Soru 14: Bilmece 2 ---
+        function checkRiddle2(ans) {
+            if(ans === 'Dayi') {
+                nextQuestion(15); // Final Söz Verme Ekranına atlar
+            } else if(ans === 'Abi') {
+                showAlert("Benim abim mi var 🤔 Ve ismi H-A-N-D-A-N?");
+            } else if(ans === 'Eniste') {
+                showAlert("Enişteme Cumhur dersem babam döver beni.. 🥊");
+            } else if(ans === 'Anne') {
+                showAlert("Aykut Enişte 1 mi 2 mi? 🎬😂");
+            }
+        }
+
+        // --- Soru 15: 404 Modal ---
         function show404() {
             showAlert("Error 404: Seçenek Bulunamadı! Bu seçeneğe izin verilmiyor, başka bir ihtimal yok. Lütfen 'Söz Veriyorum' de.");
         }
