@@ -107,9 +107,9 @@
         <!-- Soru 1: Kaçan Buton -->
         <div id="q1" class="quiz-step">
             <h2 class="text-xl font-semibold mb-10">Benimle geçirdiğin son zamanlar hayatının en güzel dönemi miydi?</h2>
-            <div class="flex justify-center gap-6 relative h-20">
+            <div class="flex justify-center gap-6 h-20">
                 <button onclick="nextQuestion(2)" class="bg-emerald-500 hover:bg-emerald-600 px-8 py-3 rounded-full font-semibold text-lg z-10">Evet</button>
-                <button id="btn-no" class="bg-slate-600 px-8 py-3 rounded-full font-semibold text-lg absolute right-0 transition-transform duration-100 ease-out z-50">Hayır</button>
+                <button id="btn-no" class="bg-slate-600 px-8 py-3 rounded-full font-semibold text-lg z-50">Hayır</button>
             </div>
         </div>
 
@@ -376,38 +376,57 @@
         let isFirstMove = true;
 
         const moveButton = (e) => {
-            e.preventDefault();
+            if (e.cancelable) e.preventDefault(); // Telefondaki dokunma (scroll vb) olaylarını engeller
             
             if(isFirstMove) {
                 noBtn.style.position = 'fixed';
+                noBtn.style.zIndex = '9999';
+                // Flex/Grid'den kalan ortalama efektlerini sıfırla ki ekran dışına itmesin
+                noBtn.style.transform = 'none'; 
+                noBtn.style.margin = '0';
                 isFirstMove = false;
             }
 
             const btnWidth = noBtn.offsetWidth;
             const btnHeight = noBtn.offsetHeight;
-            const maxX = window.innerWidth - btnWidth - 20;
-            const maxY = window.innerHeight - btnHeight - 20;
+            
+            // Ekranın saf görünür alanı (Scrollbar olmadan)
+            const padding = 20; // Ekranın tam kenarına yapışmasın diye güvenlik boşluğu
+            const maxX = document.documentElement.clientWidth - btnWidth - padding;
+            const maxY = document.documentElement.clientHeight - btnHeight - padding;
 
-            let cursorX = e.clientX || (e.touches && e.touches[0].clientX) || window.innerWidth/2;
-            let cursorY = e.clientY || (e.touches && e.touches[0].clientY) || window.innerHeight/2;
+            // İmlecin veya parmağın mevcut konumu
+            let cursorX = e.clientX || (e.touches && e.touches[0].clientX) || (window.innerWidth / 2);
+            let cursorY = e.clientY || (e.touches && e.touches[0].clientY) || (window.innerHeight / 2);
 
             let newX, newY;
             let distance = 0;
+            let maxAttempts = 50; // Sonsuz döngüye girmemesi için limit
 
-            while (distance < 150) {
-                newX = Math.random() * maxX;
-                newY = Math.random() * maxY;
-                let dx = newX + (btnWidth/2) - cursorX;
-                let dy = newY + (btnHeight/2) - cursorY;
-                distance = Math.sqrt(dx*dx + dy*dy);
+            // Butonu, imleçten en az 200 piksel uzağa (mümkün olan en uç noktalara) fırlat
+            while (distance < 200 && maxAttempts > 0) {
+                // Ekran sınırları içerisinde rastgele bir koordinat seç
+                newX = padding + (Math.random() * (maxX - padding));
+                newY = padding + (Math.random() * (maxY - padding));
+
+                // İmleç ile butonun yeni konumu arasındaki mesafeyi ölç (Pisagor)
+                let dx = (newX + btnWidth / 2) - cursorX;
+                let dy = (newY + btnHeight / 2) - cursorY;
+                distance = Math.sqrt(dx * dx + dy * dy);
+                
+                maxAttempts--;
             }
 
+            // Yeni pozisyonu uygula
             noBtn.style.left = newX + 'px';
             noBtn.style.top = newY + 'px';
+            noBtn.style.right = 'auto'; // Eski stilleri ez
+            noBtn.style.bottom = 'auto';
         };
 
         noBtn.addEventListener('mouseover', moveButton);
         noBtn.addEventListener('touchstart', moveButton, {passive: false});
+        noBtn.addEventListener('pointerdown', moveButton, {passive: false});
 
         // --- Soru 2: Hacker Typer ---
         const hackerInput = document.getElementById('hacker-input');
