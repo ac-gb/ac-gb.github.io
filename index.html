@@ -64,6 +64,9 @@
 </head>
 <body class="h-screen w-screen flex flex-col items-center justify-center p-4 relative">
 
+    <div id="youtube-player" class="hidden" style="display: none; width: 0; height: 0;"></div>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    
     <!-- GENEL UYARI MODALI (Custom Alert) -->
     <div id="custom-alert" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[60] fade-transition hide">
         <div class="bg-slate-800 border border-rose-500 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
@@ -319,11 +322,30 @@
         </p>
     </section>
 
-    <div id="youtube-player" class="hidden" style="display: none; width: 0; height: 0;"></div>
-    <script src="https://www.youtube.com/iframe_api"></script>
+    
 
     <!-- JavaScript Mekanikleri -->
     <script>
+
+        let ytPlayer;
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('youtube-player', {
+                height: '0',
+                width: '0',
+                videoId: '7maJOI3QMu0', // Senin verdiğin Yiruma şarkısının ID'si
+                playerVars: {
+                    'autoplay': 0, // Tarayıcı engeline takılmamak için girişte tetikleyeceğiz
+                    'controls': 0,
+                    'disablekb': 1,
+                    'fs': 0,
+                    'rel': 0,
+                    'loop': 1,
+                    'playlist': '7maJOI3QMu0' // Loop'un çalışması için videoId buraya da yazılmalı
+                }
+            });
+        }
+
+        
         let selectedActorCount = 0;
 
         // --- CUSTOM ALERT SİSTEMİ ---
@@ -642,23 +664,7 @@
                 if (Date.now() < end) requestAnimationFrame(frame);
             }());
         }
-        let ytPlayer;
-        function onYouTubeIframeAPIReady() {
-            ytPlayer = new YT.Player('youtube-player', {
-                height: '0',
-                width: '0',
-                videoId: '7maJOI3QMu0', // Senin verdiğin Yiruma şarkısının ID'si
-                playerVars: {
-                    'autoplay': 0, // Tarayıcı engeline takılmamak için girişte tetikleyeceğiz
-                    'controls': 0,
-                    'disablekb': 1,
-                    'fs': 0,
-                    'rel': 0,
-                    'loop': 1,
-                    'playlist': '7maJOI3QMu0' // Loop'un çalışması için videoId buraya da yazılmalı
-                }
-            });
-        }
+        
     </script>
 </body>
 </html>
