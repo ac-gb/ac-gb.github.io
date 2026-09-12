@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sana Özel Bir Sürpriz...</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f8fafc;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .fade-transition {
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        .hide {
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            transform: scale(0.95);
+        }
+
+        /* Slider Styles */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            background: #f43f5e;
+            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: 0 0 10px rgba(244, 63, 94, 0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- EKRAN 1: GİRİŞ -->
+    <section id="screen-login" class="glass-panel w-full max-w-md rounded-2xl p-8 text-center fade-transition">
+        <div class="mb-6">
+            <h1 class="text-3xl font-semibold text-rose-400 mb-2">Sistem Girişi</h1>
+            <p class="text-sm text-slate-400">Lütfen kimliğinizi doğrulayın.</p>
+        </div>
+        
+        <div class="text-left mb-4">
+            <label class="block text-xs text-slate-400 mb-1">Kullanıcı Adı</label>
+            <input type="text" value="dünyanın_en_tatlı_kızı" readonly 
+                   class="w-full bg-slate-800/50 border border-slate-600 rounded-lg p-3 text-rose-200 outline-none">
+        </div>
+
+        <div class="text-left mb-6">
+            <label class="block text-xs text-slate-400 mb-1">Şifre (Biz hangi gün sevgili olduk? DD.MM.YYYY)</label>
+            <input type="text" id="password-input" placeholder="Örn: 14.02.2023" 
+                   class="w-full bg-slate-800/50 border border-slate-600 rounded-lg p-3 text-white focus:border-rose-500 outline-none transition-colors">
+            <p id="login-error" class="text-rose-500 text-xs mt-2 hidden">Hatalı şifre! İpucu: O gün...</p>
+        </div>
+
+        <button onclick="checkPassword()" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-semibold py-3 rounded-lg transition-colors">
+            Giriş Yap
+        </button>
+    </section>
+
+    <!-- EKRAN 2: QUIZ MEKANİKLERİ -->
+    <section id="screen-quiz" class="glass-panel w-full max-w-md rounded-2xl p-8 text-center fade-transition hide relative">
+        <div class="mb-4 flex justify-between text-xs text-slate-400 font-semibold uppercase tracking-wider border-b border-slate-700 pb-2">
+            <span>Aşk Testi</span>
+            <span id="question-counter">1/5</span>
+        </div>
+
+        <!-- Soru 1: Kaçan Buton -->
+        <div id="q1" class="quiz-step">
+            <h2 class="text-xl font-semibold mb-8">Benimle geçirdiğin son 3 ay hayatının en güzel dönemi miydi?</h2>
+            <div id="q1-container" class="relative h-48 w-full border border-dashed border-slate-700 rounded-lg">
+                <button onclick="nextQuestion(2)" class="absolute top-1/2 left-1/4 -translate-y-1/2 -translate-x-1/2 bg-emerald-500 hover:bg-emerald-600 px-6 py-2 rounded-full font-semibold">Evet</button>
+                <button id="btn-no" class="absolute top-1/2 right-1/4 -translate-y-1/2 translate-x-1/2 bg-slate-600 px-6 py-2 rounded-full font-semibold transition-all duration-200">Hayır</button>
+            </div>
+        </div>
+
+        <!-- Soru 2: Hacker Typer -->
+        <div id="q2" class="quiz-step hidden">
+            <h2 class="text-xl font-semibold mb-6">Sence benim en çekici veya en sevdiğin özelliğim ne? (Kendi cümlelerinle yaz)</h2>
+            <textarea id="hacker-input" rows="4" placeholder="Buraya yazmaya başla..." 
+                      class="w-full bg-slate-800 border border-slate-600 rounded-lg p-3 text-rose-300 outline-none resize-none"></textarea>
+            <button onclick="nextQuestion(3)" id="btn-q2" class="w-full bg-rose-500 py-3 rounded-lg mt-4 opacity-50 pointer-events-none transition-opacity">Cevabı Onayla</button>
+        </div>
+
+        <!-- Soru 3: Slider -->
+        <div id="q3" class="quiz-step hidden">
+            <h2 class="text-xl font-semibold mb-8">Beni ne kadar çok seviyorsun?</h2>
+            <div class="mb-8">
+                <input type="range" id="love-slider" min="0" max="100" value="100">
+                <div class="flex justify-between text-xs text-slate-400 mt-2">
+                    <span>Hiç</span>
+                    <span>Çok Fazla</span>
+                </div>
+            </div>
+            <button onclick="nextQuestion(4)" class="w-full bg-rose-500 py-3 rounded-lg">Kesinlikle %100!</button>
+        </div>
+
+        <!-- Soru 4: Aynı Şıklar -->
+        <div id="q4" class="quiz-step hidden">
+            <h2 class="text-xl font-semibold mb-6">Şu an bu dünyadaki en şanslı erkek kim?</h2>
+            <div class="grid gap-3">
+                <button onclick="nextQuestion(5)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg transition-colors">A) Sen</button>
+                <button onclick="nextQuestion(5)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg transition-colors">B) Yine sen</button>
+                <button onclick="nextQuestion(5)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg transition-colors">C) Kesinlikle sen</button>
+                <button onclick="nextQuestion(5)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg transition-colors">D) Hepsi</button>
+            </div>
+        </div>
+
+        <!-- Soru 5: 404 Modal -->
+        <div id="q5" class="quiz-step hidden">
+            <h2 class="text-xl font-semibold mb-8">Gelecekte birlikte daha çok anı biriktireceğimize söz veriyor musun?</h2>
+            <div class="flex gap-4 justify-center">
+                <button onclick="finishTest()" class="bg-emerald-500 py-3 px-6 rounded-lg font-semibold w-1/2">Söz Veriyorum</button>
+                <button onclick="showModal()" class="bg-slate-600 py-3 px-6 rounded-lg font-semibold w-1/2">Düşünmem Lazım</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hata Modal (404) -->
+    <div id="error-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 fade-transition hide">
+        <div class="bg-slate-800 border-2 border-rose-500 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
+            <div class="text-rose-500 text-5xl mb-4">⚠️</div>
+            <h3 class="text-xl font-bold text-white mb-2">Error 404: Seçenek Bulunamadı!</h3>
+            <p class="text-slate-300 mb-6">Bu seçeneğe izin verilmiyor! Lütfen 'Söz Veriyorum' butonunu seçiniz. Başka bir ihtimal yok.</p>
+            <button onclick="hideModal()" class="bg-rose-500 w-full py-2 rounded-lg font-semibold text-white">Tamam, Anladım</button>
+        </div>
+    </div>
+
+    <!-- EKRAN 3: FİNAL -->
+    <section id="screen-final" class="glass-panel w-full max-w-md rounded-2xl p-8 text-center fade-transition hide">
+        <div class="text-emerald-400 text-6xl mb-4">✨</div>
+        <h1 class="text-3xl font-bold text-white mb-2">Başarı Skoru: %100</h1>
+        <h2 class="text-xl text-rose-400 mb-6">Tebrikler Sevgilim!</h2>
+        
+        <p class="text-slate-300 mb-8 leading-relaxed">
+            Beni bu kadar kısa sürede kusursuz bir şekilde tanıdığına emindim. Zaten aksini seçme şansın da yoktu... İyi ki hayatımdasın, seni çok seviyorum!
+        </p>
+
+        <button onclick="revealGift()" id="btn-reveal" class="w-full border-2 border-rose-500 text-rose-400 hover:bg-rose-500 hover:text-white font-semibold py-3 rounded-lg transition-all">
+            🎁 Asıl Hediyeyi Gör
+        </button>
+
+        <div id="gift-card" class="mt-6 pt-6 border-t border-slate-700 hidden">
+            <!-- Buraya kendi görsel linkinizi ekleyebilirsiniz (src kısmına) -->
+            <img src="https://images.unsplash.com/photo-1518199268839-497d02bc3424?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                 alt="Biz" class="w-full h-48 object-cover rounded-lg mb-4 shadow-lg border border-slate-600">
+            <h3 class="font-bold text-lg text-rose-300">Özel Randevu Daveti</h3>
+            <p class="text-sm text-slate-300 mt-2">Bu haftasonu en sevdiğin yerde yemeğe çıkıyoruz. Hazırlan!</p>
+        </div>
+    </section>
+
+    <script>
+        
+        function checkPassword() {
+            const input = document.getElementById('password-input').value.trim();
+            const error = document.getElementById('login-error');
+            
+            const correctPassword = "20.06.2026"; 
+
+            if(input === correctPassword) {
+                switchScreen('screen-login', 'screen-quiz');
+            } else {
+                error.classList.remove('hidden');
+                document.getElementById('password-input').classList.add('border-rose-500');
+            }
+        }
+
+        function switchScreen(fromId, toId) {
+            const fromEl = document.getElementById(fromId);
+            const toEl = document.getElementById(toId);
+            fromEl.classList.add('hide');
+            setTimeout(() => {
+                fromEl.classList.add('hidden');
+                toEl.classList.remove('hidden');
+                setTimeout(() => toEl.classList.remove('hide'), 50);
+            }, 500);
+        }
+
+        function nextQuestion(num) {
+            document.querySelectorAll('.quiz-step').forEach(el => el.classList.add('hidden'));
+            document.getElementById('q' + num).classList.remove('hidden');
+            document.getElementById('question-counter').innerText = num + '/5';
+        }
+
+        const noBtn = document.getElementById('btn-no');
+        const q1Container = document.getElementById('q1-container');
+
+        const moveButton = (e) => {
+            e.preventDefault();
+            
+            const containerRect = q1Container.getBoundingClientRect();
+            const btnRect = noBtn.getBoundingClientRect();
+            
+            const maxX = containerRect.width - btnRect.width - 20;
+            const maxY = containerRect.height - btnRect.height - 20;
+            
+            const newX = Math.max(10, Math.random() * maxX);
+            const newY = Math.max(10, Math.random() * maxY);
+            
+            noBtn.style.left = newX + 'px';
+            noBtn.style.top = newY + 'px';
+            noBtn.style.transform = 'none';
+        };
+
+        noBtn.addEventListener('mouseover', moveButton);
+        noBtn.addEventListener('touchstart', moveButton, {passive: false});
+        noBtn.addEventListener('pointerdown', moveButton, {passive: false});
+
+
+        const hackerInput = document.getElementById('hacker-input');
+        const targetText = "Çok düşünceli olman ve beni her zaman gülümsetebilmen.";
+        let typedCount = 0;
+
+        hackerInput.addEventListener('input', (e) => {
+            typedCount++;
+            if (typedCount > targetText.length) {
+                document.getElementById('btn-q2').classList.remove('opacity-50', 'pointer-events-none');
+                typedCount = targetText.length;
+            }
+            hackerInput.value = targetText.substring(0, typedCount);
+        });
+
+
+        const slider = document.getElementById('love-slider');
+        const snapSliderBack = () => {
+
+            let currentVal = parseInt(slider.value);
+            const interval = setInterval(() => {
+                if(currentVal < 100) {
+                    currentVal += Math.ceil((100 - currentVal) / 2) + 1;
+                    slider.value = currentVal;
+                } else {
+                    slider.value = 100;
+                    clearInterval(interval);
+                }
+            }, 20);
+        };
+
+        slider.addEventListener('touchend', snapSliderBack);
+        slider.addEventListener('mouseup', snapSliderBack);
+
+        function showModal() {
+            const modal = document.getElementById('error-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('hide'), 10);
+        }
+
+        function hideModal() {
+            const modal = document.getElementById('error-modal');
+            modal.classList.add('hide');
+            setTimeout(() => modal.classList.add('hidden'), 500);
+        }
+
+        function finishTest() {
+            switchScreen('screen-quiz', 'screen-final');
+            setTimeout(() => {
+                fireConfetti();
+            }, 600);
+        }
+
+        function fireConfetti() {
+            var duration = 3000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#f43f5e', '#10b981', '#3b82f6']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#f43f5e', '#10b981', '#3b82f6']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        function revealGift() {
+            document.getElementById('btn-reveal').classList.add('hidden');
+            document.getElementById('gift-card').classList.remove('hidden');
+            document.getElementById('gift-card').classList.add('animate-pulse');
+            setTimeout(() => document.getElementById('gift-card').classList.remove('animate-pulse'), 1000);
+        }
+    </script>
+</body>
+</html>
