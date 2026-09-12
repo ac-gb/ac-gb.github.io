@@ -319,6 +319,9 @@
         </p>
     </section>
 
+    <div id="youtube-player" class="hidden" style="display: none; width: 0; height: 0;"></div>
+    <script src="https://www.youtube.com/iframe_api"></script>
+
     <!-- JavaScript Mekanikleri -->
     <script>
         let selectedActorCount = 0;
@@ -635,6 +638,23 @@
                 confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#f43f5e', '#10b981', '#3b82f6'] });
                 if (Date.now() < end) requestAnimationFrame(frame);
             }());
+        }
+        let ytPlayer;
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('youtube-player', {
+                height: '0',
+                width: '0',
+                videoId: '7maJOI3QMu0', // Senin verdiğin Yiruma şarkısının ID'si
+                playerVars: {
+                    'autoplay': 0, // Tarayıcı engeline takılmamak için girişte tetikleyeceğiz
+                    'controls': 0,
+                    'disablekb': 1,
+                    'fs': 0,
+                    'rel': 0,
+                    'loop': 1,
+                    'playlist': '7maJOI3QMu0' // Loop'un çalışması için videoId buraya da yazılmalı
+                }
+            });
         }
     </script>
 </body>
