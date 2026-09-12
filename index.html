@@ -137,7 +137,7 @@
 
         <!-- Soru 4: Aktörler Checkbox -->
         <div id="q4" class="quiz-step hidden">
-            <h2 class="text-lg font-semibold mb-4">Dünyanın en yakışıklı ve karizmatik erkekleri kimlerdir? (Seçim yapınız)</h2>
+            <h2 class="text-lg font-semibold mb-4">Dünyanın en yakışıklı ve karizmatik erkekleri kimlerdir? (Çoklu seçim yapılabilir)</h2>
             <div class="grid grid-cols-2 gap-3 mb-6 text-sm">
                 <!-- Seçildiğinde stilin çok net değişmesi için peer-checked tasarımı güncellendi -->
                 <label class="cursor-pointer relative block">
@@ -190,18 +190,20 @@
 
         <!-- Soru 5: Şehir -->
         <div id="q5" class="quiz-step hidden">
-            <h2 class="text-xl font-semibold mb-6">Marmaris doğumluyum ama şu an hangi şehrin ayazını yiyorum?</h2>
+            <h2 class="text-xl font-semibold mb-6">Kışları hangi şehrin ayazını yiyorum? (İpucu: Harika, mükemmel, fevkalade şehir!)</h2>
             <div class="grid gap-3">
-                <button onclick="checkCity('Antalya')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Antalya</button>
-                <button onclick="checkCity('Eskişehir')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Eskişehir</button>
-                <button onclick="checkCity('İzmir')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">İzmir</button>
+                <button onclick="checkCity('Antalya')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Antalya 🔥</button>
+                <button onclick="checkCity('Eskişehir')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Eskişehir ❤️</button>
+                <button onclick="checkCity('İzmir')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">İzmir 🎶</button>
+                <button onclick="checkCity('Isparta')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Isparta 💩</button>
             </div>
         </div>
 
         <!-- Soru 6: Sıcak ve Kalabalık -->
         <div id="q6" class="quiz-step hidden">
-            <h2 class="text-lg font-semibold mb-6">Yazın 40 derece sıcakta, kalabalık bir düğüne/partiye gitme fikri bana ne hissettirir?</h2>
+            <h2 class="text-lg font-semibold mb-6">Yazın 40 derece sıcakta, kalabalık bir davete gitme fikri bana ne hissettirir?</h2>
             <div class="grid gap-3">
+                <button onclick="checkHeat('Mükemmel')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Kalabalık davetleri her şeyden çok severim..</button>
                 <button onclick="checkHeat('Bayılırım')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Bayılırım, çok eğlenceli!</button>
                 <button onclick="checkHeat('FenaDeğil')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Katlanabilirim herhalde</button>
                 <button onclick="checkHeat('MaviEkran')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-semibold text-rose-300">Windows Mavi Ekran (Error) Veririm</button>
@@ -212,9 +214,10 @@
         <div id="q7" class="quiz-step hidden">
             <h2 class="text-xl font-semibold mb-6">Tatili ve gezmeyi sevmediğime göre, boş zamanımda beni nerede bulursun?</h2>
             <div class="grid gap-3">
-                <button onclick="checkHobby('Tatil')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Seyahat rotası çizerken</button>
-                <button onclick="checkHobby('Oyun')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Bilgisayar başında oyun gömerken</button>
-                <button onclick="checkHobby('Parti')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Dışarıda kalabalıkta</button>
+                <button onclick="checkHobby('Tatil')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Hayallere dalıp seyahat rotası çizerken</button>
+                <button onclick="checkHobby('Oyun')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Transa geçmiş vaziyette oyun oynarken veya çalışırken</button>
+                <button onclick="checkHobby('Parti')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Dışarıda ve özellikle kalabalık ortamlarda</button>
+                <button onclick="checkHobby('Pavyon')" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg">Pavyon'da tabiiiii kiiiii</button>
             </div>
         </div>
 
@@ -409,8 +412,14 @@
         function checkCity(city) {
             if(city === 'Eskişehir') {
                 nextQuestion(6);
-            } else {
-                showAlert("Mükemmel olan o şehirden bahsediyorum. Isparta'dan bile güzel olan 🥶");
+            } else if (city === 'İzmir'){
+                showAlert("Anca Manifest dinlemeye gidilecek bir şehir. Burada yaşanmaz ki 🙃");
+            }
+            else if (city === 'Antalya'){
+                showAlert("Hayııırr! Kışı bile sıcak, orada yaşadığım düşüncesinde bile yanıyorum 🔥");
+            }
+            else if (city === 'Isparta'){
+                showAlert("Güzelim, dedim ki 'Harika, mükemmel, fevkalade şehir!' Isparta olsa direkt derdim zaten 😜");
             }
         }
 
@@ -418,8 +427,14 @@
         function checkHeat(ans) {
             if(ans === 'MaviEkran') {
                 nextQuestion(7);
-            } else {
-                showAlert("Sıcağı ve kalabalığı ne kadar sevmediğimi unutmuş olamazsın! Terliyorum şu an... 🥵");
+            } else if(ans === 'Mükemmel') {
+                showAlert("Saçmalamaaa... Sen varken mümkün mü? 🥰");
+            }
+            else if(ans === 'Bayılırım') {
+                showAlert("Gerçekten bayılırım. Amaa yere doğru... 🥴");
+            }
+            else if(ans === 'FenaDeğil') {
+                showAlert("Ortadan ikiye mi 😵‍💫");
             }
         }
 
@@ -427,8 +442,12 @@
         function checkHobby(ans) {
             if(ans === 'Oyun') {
                 nextQuestion(8);
-            } else {
-                showAlert("Ben mi.... Hata 404 Not Found. 🎮");
+            } else if(ans === 'Pavyon'){
+                showAlert("Bebeğim o senin hayalindi. Karıştırma lütfen..");
+            }else if(ans === 'Tatil'){
+                showAlert("Yanlış! Tek rotam sensin 💘");
+            }else if(ans === 'Parti'){
+                showAlert("'Evvvett, doğru cevap. Cluplar, barlar, publar.... Akıyoruz alemlere' diyeceğimi mi sandın. Kesin uyuyomdur 😴");
             }
         }
 
@@ -437,8 +456,15 @@
             const age = document.getElementById('age-input').value;
             if(age == 31) {
                 nextQuestion(9);
-            } else {
-                showAlert("Kimin yaşı bu!!! Benim fiziksel 'level'ımı (yaşımı) soruyorum! :)");
+            } else if (age < 18){
+                showAlert("Poliiiiisssss");
+            } else if (age >= 18 && age < 31){
+                showAlert("Daha küçük olmadığım için özür dilerim 😡");
+            }else if (age > 31 && age <= 44){
+                showAlert("Bu yaşta tanıdığın kim var? 🤔");
+            }
+            else if (age > 44){
+                showAlert( "O kadar mı yaşlı gösteriyorum 😭");
             }
         }
 
